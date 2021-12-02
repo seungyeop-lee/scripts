@@ -1,0 +1,41 @@
+# https://cloudinit.readthedocs.io/en/latest/topics/examples.html
+users:
+  - default
+
+write_files:
+  - path: /home/ubuntu/setup-podman.sh
+    content: |
+      #!/bin/bash
+
+      # Set correct permission on own home folder
+      sudo chown ubuntu:ubuntu .
+      chmod 755 .
+
+      # Install podman
+      . /etc/os-release
+      echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/testing/xUbuntu_${VERSION_ID}/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:testing.list
+      curl -L "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/testing/xUbuntu_${VERSION_ID}/Release.key" | sudo apt-key add -
+      sudo apt-get update -qq
+      sudo apt-get -qq -y install podman fuse-overlayfs
+
+      # root mode configuration
+      sudo cp /home/ubuntu/.ssh/authorized_keys /root/.ssh/authorized_keys
+      sudo systemctl --system enable --now podman.socket
+
+      # start ssh
+      sudo systemctl enable --now ssh.service
+
+      # install docker-compose
+      sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      sudo chmod +x /usr/local/bin/docker-compose
+
+      # set docker conf using podman
+      export DOCKER_HOST=unix://run/podman/podman.sock
+      sudo ln -s /run/podman/podman.sock /var/run/docker.sock
+      sudo ln -s /usr/bin/podman /usr/bin/docker
+    permissions: "0755"
+
+runcmd:
+  - sudo cp /etc/skel/.bashrc /home/ubuntu/.bashrc
+  - sudo cp /etc/skel/.bash_logout /home/ubuntu/.bash_logout
+  - sudo cp /etc/skel/.profile /home/ubuntu/.profile
