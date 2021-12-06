@@ -48,10 +48,10 @@ install_addon:
 		--set storageClass.defaultClass=true \
 		--set nfs.volumeName=nfs-client-root
 
-.PHONY: min
+.PHONY: deploy_mw
 deploy_mw: requirement create_m create_w apply_kubeconfig install_addon
 
-.PHONY: all
+.PHONY: deploy_mw3
 deploy_mw3: requirement create_m create_w1 create_w2 create_w3 apply_kubeconfig install_addon
 
 .PHONY: clear

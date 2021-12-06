@@ -18,10 +18,12 @@ sudo apt install -y kubelet=$1 kubectl=$1 kubeadm=$1
 sudo systemctl enable --now docker
 sudo systemctl enable --now kubelet
 
-# docker daemon config for systemd from cgroupfs & restart 
+# docker daemon config for systemd from cgroupfs, registry mirror & restart
+# https://cloud.google.com/container-registry/docs/pulling-cached-images
 cat <<EOF | sudo tee /etc/docker/daemon.json
 {
-  "exec-opts": ["native.cgroupdriver=systemd"]
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "registry-mirrors": ["https://mirror.gcr.io"]
 }
 EOF
 sudo systemctl daemon-reload && sudo systemctl restart docker
