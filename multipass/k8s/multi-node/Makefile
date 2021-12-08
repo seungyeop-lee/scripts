@@ -54,6 +54,14 @@ deploy_mw: requirement create_m create_w apply_kubeconfig install_addon
 .PHONY: deploy_mw3
 deploy_mw3: requirement create_m create_w1 create_w2 create_w3 apply_kubeconfig install_addon
 
+.PHONY: stop
+stop:
+	multipass stop --all
+
+.PHONY: stop
+start:
+	multipass start --all
+
 .PHONY: clear
 clear:
 	multipass delete --all
