@@ -1,0 +1,27 @@
+# https://cloudinit.readthedocs.io/en/latest/topics/examples.html
+users:
+  - default
+
+write_files:
+  - path: /home/ubuntu/setup-ssh.sh
+    content: |
+      #!/bin/bash
+
+      # Set correct permission on own home folder
+      sudo chown ubuntu:ubuntu .
+      chmod 755 .
+
+      # root mode configuration
+      sudo cp /home/ubuntu/.ssh/authorized_keys /root/.ssh/authorized_keys
+
+      # start ssh mounting host directories
+      sudo systemctl enable --now ssh.service
+    permissions: "0755"
+
+runcmd:
+  - sudo cp /etc/skel/.bashrc /home/ubuntu/.bashrc
+  - sudo cp /etc/skel/.bash_logout /home/ubuntu/.bash_logout
+  - sudo cp /etc/skel/.profile /home/ubuntu/.profile
+
+ssh_authorized_keys:
+  - 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQClVs6YYsvW2uX2OXBOo/yM5KvyMfQzynA5LxDy2OpauoYCfAn2WOvRA0Br9wOO6VigQuN/+2fyKvinw+xTu1ph3Oio/MiLxyf+j4jq1BM8rpS/O/Kv9L9XEAY9vbFjKXsQO+Io/wo1uLyzxKyAb7TGsi5tjRZd+nF7mqaZfPKWmcyAWa10CN8N4aLz9xWrK/ejAkGUeggy7L/F76zmrFw+8/NWBtOqLeL++cexkjWbbzblnIJArc+JpoiZgtdTIfO/3QuonEufG080e3hoZDhOTdlcIsPwxzEZpHLogTA1vlE30NIUowS9z5IoudNX3R39pP4C2deblOeDcL949htyk1+pD2KWGbR5hXT28bcrUADtAW0d2JAZ4g1Xy5bajGb+FIkoVBZve/SEbCFQJDtdecMuARABGo6gAo2Z4/VqznedNnbEdYrxpXkrQerAXLjuZzY5QMSM4wt9thpm7BnUacUIoISt0YgPb53qxiJbmI1s+rHlF92PkxVMYtaJCp8= leeseungyeop@Leeui-MacBookPro.local'
