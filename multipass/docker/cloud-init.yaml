@@ -1,0 +1,48 @@
+package_upgrade: true
+
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+
+write_files:
+  - path: /home/ubuntu/setup-docker.sh
+    content: |
+      #!/bin/bash
+
+      # Set correct permission on own home folder
+      sudo chown ubuntu:ubuntu .
+      chmod 755 .
+
+      # Install docker
+      sudo mkdir -m 0755 -p /etc/apt/keyrings
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+        $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+      echo "sudo apt-get update && sudo apt-get upgrade"
+      sudo apt-get update && sudo apt-get upgrade
+      
+      echo "sudo apt-get -qq -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin fuse-overlayfs"
+      sudo apt-get -qq -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin fuse-overlayfs
+
+      echo "sudo systemctl enable docker.service"
+      sudo systemctl enable docker.service
+      echo "sudo systemctl enable containerd.service"
+      sudo systemctl enable containerd.service
+
+      echo "sudo sed -i 's/-H fd:\/\//-H fd:\/\/ -H tcp:\/\/0.0.0.0:2375/' /lib/systemd/system/docker.service"
+      sudo sed -i 's/-H fd:\/\//-H fd:\/\/ -H tcp:\/\/0.0.0.0:2375/' /lib/systemd/system/docker.service
+      echo "sudo systemctl daemon-reload"
+      sudo systemctl daemon-reload
+      echo "sudo systemctl restart docker"
+      sudo systemctl restart docker
+    permissions: "0755"
+
+runcmd:
+  - sudo cp /etc/skel/.bashrc /home/ubuntu/.bashrc
+  - sudo cp /etc/skel/.bash_logout /home/ubuntu/.bash_logout
+  - sudo cp /etc/skel/.profile /home/ubuntu/.profile
